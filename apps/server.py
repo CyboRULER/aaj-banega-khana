@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import os
+import socket
 import sys
 import threading
 import time
@@ -94,6 +95,22 @@ def make_handler(app):
         def log_message(self, *args):  # silence default logging
             pass
 
+        def _json(self, payload, status=200):
+            data = json.dumps(payload).encode()
+            self.send_response(status)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def do_GET(self):
+            # Hosted platforms poll a health endpoint to decide if the deploy is up.
+            if self.path.rstrip("/") in ("/health", ""):
+                self._json({"ok": True, "plan_time": app.settings.plan_time})
+            else:
+                self.send_response(404)
+                self.end_headers()
+
         def do_POST(self):
             if self.path != "/inbound":
                 self.send_response(404)
@@ -108,22 +125,34 @@ def make_handler(app):
             except Exception as exc:  # never let one bad message kill the server
                 log.error("inbound failed: %s", exc)
                 payload = {"error": str(exc)}
-            data = json.dumps(payload).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header("Content-Length", str(len(data)))
-            self.end_headers()
-            self.wfile.write(data)
+            self._json(payload)
 
     return Handler
+
+
+def _make_server(host: str, port: int, handler) -> ThreadingHTTPServer:
+    """Bind the HTTP server, using IPv6 when the host is an IPv6 address.
+
+    Railway's private network resolves *.railway.internal to IPv6 only, so the
+    core must bind '::' there or the gateway cannot reach it. Binding '::' is
+    dual-stack on Linux, so IPv4 callers still work.
+    """
+    if ":" in host:
+        class _V6(ThreadingHTTPServer):
+            address_family = socket.AF_INET6
+        return _V6((host, port), handler)
+    return ThreadingHTTPServer((host, port), handler)
 
 
 def main() -> None:
     app = build_live_app()
     threading.Thread(target=_scheduler_loop, args=(app,), daemon=True).start()
-    port = int(os.environ.get("ABK_SERVER_PORT", "8000"))
-    server = ThreadingHTTPServer(("0.0.0.0", port), make_handler(app))
-    log.info("ABK core listening on :%d (plan time %s)", port, app.settings.plan_time)
+    # Hosted platforms inject PORT; ABK_SERVER_PORT still wins for local runs.
+    port = int(os.environ.get("ABK_SERVER_PORT") or os.environ.get("PORT") or "8000")
+    host = os.environ.get("ABK_BIND_HOST", "0.0.0.0")
+    server = _make_server(host, port, make_handler(app))
+    log.info("ABK core listening on [%s]:%d (plan time %s)", host, port,
+             app.settings.plan_time)
     server.serve_forever()
 
 

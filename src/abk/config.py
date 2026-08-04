@@ -53,6 +53,9 @@ class Settings:
 
     db_path: str = "data/abk.sqlite3"
     recipe_dir: str = "recipes"
+    # When set, persistence uses Postgres instead of the SQLite file above.
+    # Hosted platforms (Railway, Render) inject DATABASE_URL automatically.
+    database_url: str = ""
 
     def today(self) -> str:
         """Today's date in the configured timezone (falls back to local time)."""
@@ -105,4 +108,5 @@ class Settings:
             gateway_url=e.get("ABK_GATEWAY_URL", d.gateway_url),
             db_path=e.get("ABK_DB_PATH", d.db_path),
             recipe_dir=e.get("ABK_RECIPE_DIR", d.recipe_dir),
+            database_url=e.get("ABK_DATABASE_URL") or e.get("DATABASE_URL", d.database_url),
         )

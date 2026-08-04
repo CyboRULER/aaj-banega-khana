@@ -1,0 +1,4 @@
+# Core runs on the stdlib alone; these are the live-deploy extras.
+psycopg[binary]>=3.1          # Postgres persistence (ABK_DATABASE_URL)
+anthropic>=0.39               # Claude LLM adapter
+youtube-transcript-api>=0.6   # recipe transcription from YouTube

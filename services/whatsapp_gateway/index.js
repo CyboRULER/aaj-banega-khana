@@ -33,12 +33,17 @@ function loadEnv() {
 }
 loadEnv();
 
-const PORT = process.env.ABK_GATEWAY_PORT || 8787;
+// Railway/Render inject PORT; ABK_GATEWAY_PORT still wins for local runs.
+const PORT = process.env.ABK_GATEWAY_PORT || process.env.PORT || 8787;
 const WEBHOOK_URL = process.env.ABK_WEBHOOK_URL || "http://localhost:8000/inbound";
 const GROUP_NAME = (process.env.ABK_GROUP_NAME || "").trim();
+// Session keys must live on durable storage, or the QR has to be rescanned on
+// every restart. Point this at a mounted volume when deployed.
+const AUTH_DIR = process.env.ABK_AUTH_DIR || "./auth_info";
 
 const log = pino({ level: "info", transport: { target: "pino-pretty" } });
 let sock = null;
+let lastQr = null;
 let groupId = (process.env.ABK_GROUP_ID || "").trim();
 let knownGroups = [];
 // WhatsApp addresses group members by LID (e.g. 2409...@lid) rather than by
@@ -114,7 +119,7 @@ async function refreshGroups() {
 }
 
 async function start() {
-  const { state, saveCreds } = await useMultiFileAuthState("./auth_info");
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR);
   // WhatsApp rejects outdated web versions, so always use the current one.
   const { version } = await fetchLatestBaileysVersion();
   log.info(`using WhatsApp Web version ${version.join(".")}`);
@@ -130,9 +135,14 @@ async function start() {
   sock.ev.on("connection.update", async (u) => {
     const { connection, lastDisconnect, qr } = u;
     if (qr) {
+      lastQr = qr;
       log.info("scan this QR with the agent's WhatsApp (Linked devices):");
       qrcode.generate(qr, { small: true });
+      // Hosted log viewers often mangle the block characters above, so expose
+      // the payload at GET /qr as a scannable fallback.
+      log.info("or open GET /qr if this renders badly in your log viewer");
     }
+    if (connection === "open") lastQr = null;
     if (connection === "close") {
       const shouldReconnect =
         lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
@@ -200,6 +210,22 @@ app.post("/send", async (req, res) => {
     log.error(e, "send failed");
     res.status(500).json({ error: String(e) });
   }
+});
+
+// One-time pairing QR, as scannable HTML. Token-gated: anyone who scans this
+// links the gateway to their own WhatsApp, so it must not be world-readable.
+app.get("/qr", (req, res) => {
+  const token = process.env.ABK_QR_TOKEN || "";
+  if (!token) return res.status(404).send("set ABK_QR_TOKEN to enable /qr");
+  if (req.query.token !== token) return res.status(403).send("bad token");
+  if (!lastQr) return res.send("<p>No pending QR - already linked, or still starting up.</p>");
+  qrcode.generate(lastQr, { small: true }, (art) => {
+    res.type("html").send(
+      `<body style="background:#fff;margin:0;padding:24px">
+       <pre style="font:12px/12px monospace;letter-spacing:0;color:#000">${art}</pre>
+       <p style="font:14px sans-serif">WhatsApp &rarr; Settings &rarr; Linked devices &rarr; Link a device</p>
+       </body>`);
+  });
 });
 
 app.get("/health", (_req, res) =>

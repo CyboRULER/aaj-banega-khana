@@ -15,6 +15,7 @@ dependencies = []
 live = [
     "anthropic>=0.39",          # real Claude LLM adapter
     "youtube-transcript-api>=0.6",  # real transcription adapter
+    "psycopg[binary]>=3.1",     # Postgres persistence for hosted deploys
 ]
 dev = ["pytest>=8"]
 

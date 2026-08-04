@@ -69,7 +69,13 @@ def build_app(
     provider = provider or (build_provider(settings) if settings.grocery_provider else ManualListAdapter())
 
     mirror = MarkdownMirror(settings.recipe_dir) if markdown_mirror else None
-    if persist:
+    if persist and settings.database_url:
+        from .services.db_postgres import (connect, PostgresProfileStore,
+                                           PostgresRecipeRepository)
+        conn = connect(settings.database_url)
+        recipe_book = RecipeBook(PostgresRecipeRepository(conn), mirror)
+        profile_store = PostgresProfileStore(conn, profile)
+    elif persist:
         from .services.db import connect, SqliteProfileStore, SqliteRecipeRepository
         conn = connect(settings.db_path)
         recipe_book = RecipeBook(SqliteRecipeRepository(conn), mirror)
