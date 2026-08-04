@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "abk"
+version = "0.1.0"
+description = "Aaj Banega Khana - multi-agent daily meal planning, cooking and grocery system"
+requires-python = ">=3.10"
+# Core runs with ZERO third-party deps (stdlib only) in offline/demo mode.
+# Live adapters are optional extras.
+dependencies = []
+
+[project.optional-dependencies]
+live = [
+    "anthropic>=0.39",          # real Claude LLM adapter
+    "youtube-transcript-api>=0.6",  # real transcription adapter
+]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

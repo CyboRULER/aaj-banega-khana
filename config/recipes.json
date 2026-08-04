@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Paneer Bhurji with Roti",
+    "macros": { "calories": 520, "protein": 30, "carbs": 45, "fat": 24 },
+    "ingredients": [
+      { "name": "paneer", "quantity": 200, "unit": "g" },
+      { "name": "roti", "quantity": 2, "unit": "unit" },
+      { "name": "onion", "quantity": 1, "unit": "unit" },
+      { "name": "tomato", "quantity": 1, "unit": "unit" }
+    ],
+    "steps": ["Crumble paneer", "Saute onion and tomato with spices", "Toss paneer and serve with roti"],
+    "source_link": null
+  },
+  {
+    "name": "Chicken Curry with Rice",
+    "macros": { "calories": 650, "protein": 45, "carbs": 70, "fat": 18 },
+    "ingredients": [
+      { "name": "chicken", "quantity": 250, "unit": "g" },
+      { "name": "rice", "quantity": 1.5, "unit": "cup" },
+      { "name": "onion", "quantity": 1, "unit": "unit" },
+      { "name": "tomato", "quantity": 1, "unit": "unit" }
+    ],
+    "steps": ["Cook rice", "Make onion-tomato gravy", "Simmer chicken and serve"],
+    "source_link": null
+  },
+  {
+    "name": "Egg Bhurji with Oats",
+    "macros": { "calories": 430, "protein": 28, "carbs": 35, "fat": 18 },
+    "ingredients": [
+      { "name": "egg", "quantity": 3, "unit": "unit" },
+      { "name": "oats", "quantity": 1, "unit": "cup" },
+      { "name": "onion", "quantity": 1, "unit": "unit" }
+    ],
+    "steps": ["Cook masala oats", "Scramble eggs with onion", "Plate together"],
+    "source_link": null
+  },
+  {
+    "name": "Dal Rice with Ghee",
+    "macros": { "calories": 560, "protein": 22, "carbs": 90, "fat": 10 },
+    "ingredients": [
+      { "name": "rice", "quantity": 1, "unit": "cup" },
+      { "name": "dal", "quantity": 1, "unit": "cup" },
+      { "name": "ghee", "quantity": 1, "unit": "tbsp" }
+    ],
+    "steps": ["Pressure-cook dal", "Cook rice", "Temper and serve with ghee"],
+    "source_link": null
+  },
+  {
+    "name": "Banana Peanut Butter Shake",
+    "macros": { "calories": 400, "protein": 25, "carbs": 45, "fat": 14 },
+    "ingredients": [
+      { "name": "banana", "quantity": 1, "unit": "unit" },
+      { "name": "peanut butter", "quantity": 2, "unit": "tbsp" },
+      { "name": "milk", "quantity": 1, "unit": "cup" },
+      { "name": "whey", "quantity": 1, "unit": "scoop" }
+    ],
+    "steps": ["Blend all ingredients", "Serve chilled"],
+    "source_link": null
+  }
+]

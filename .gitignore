@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+services/whatsapp_gateway/auth_info/
+
+# Local data / secrets
+.env
+data/
+recipes/
+*.sqlite3
+*.db
+logs/
+
+# macOS
+.DS_Store
+
+# Local Claude Code settings (may contain real IDs/paths)
+.claude/settings.local.json

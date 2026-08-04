@@ -1,0 +1,11 @@
+{
+  "name": "Sample User",
+  "goal": "muscle gain",
+  "body_type": "lean-fat",
+  "weight_kg": 70,
+  "height_cm": 175,
+  "meals_per_day": 4,
+  "macro_targets": { "calories": 2700, "protein": 160, "carbs": 350, "fat": 75 },
+  "preferences": ["high-protein", "indian"],
+  "restrictions": []
+}
