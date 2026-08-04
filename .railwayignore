@@ -1,0 +1,18 @@
+# Never upload secrets or local state into the build context.
+# Runtime config comes from Railway service variables instead.
+.env
+data/
+logs/
+recipes/
+*.sqlite3
+*.db
+services/whatsapp_gateway/auth_info/
+services/whatsapp_gateway/node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.claude/
+.DS_Store
