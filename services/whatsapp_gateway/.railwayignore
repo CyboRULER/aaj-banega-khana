@@ -1,0 +1,9 @@
+# This directory is its own build context when deployed as a separate service,
+# so the repo-root .railwayignore does not apply here.
+# auth_info holds live WhatsApp session keys - it must never enter an image.
+# On Railway the session lives on the volume at ABK_AUTH_DIR instead.
+auth_info/
+node_modules/
+.env
+*.log
+.DS_Store
